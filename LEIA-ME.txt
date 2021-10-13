@@ -1,0 +1,5 @@
+As bibliotecas necessárias para o funcionamento do programa estão listadas a seguir:
+	commons-email-1.5
+	mail-1.4.7
+
+Elas se encontram na pasta Bibliotecas

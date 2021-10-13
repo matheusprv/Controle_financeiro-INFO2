@@ -1,0 +1,146 @@
+SET SEARCH_PATH TO Matheus_Peixoto;
+DROP TABLE IF EXISTS usuario CASCADE;
+
+CREATE TABLE usuario
+(
+   cpf        char(14)       NOT NULL,
+   email      varchar(254),
+   senha      varchar(63),
+   nome       varchar(20),
+   sobrenome  varchar(100),
+   saldo      numeric
+);
+
+ALTER TABLE usuario
+   ADD CONSTRAINT usuario_pkey
+   PRIMARY KEY (cpf);
+
+COMMIT;
+
+DROP TABLE IF EXISTS objetivos CASCADE;
+
+CREATE TABLE objetivos
+(
+   idobjetivo               integer        NOT NULL,
+   cpf                      char(14)       NOT NULL,
+   meta                     varchar(100),
+   caixa                    numeric,
+   aportes_futuros          numeric,
+   preco                    numeric,
+   data_estimada            date,
+   data_adicionar_no_caixa  date,
+   adicionar_no_caixa       boolean
+);
+
+ALTER TABLE objetivos
+   ADD CONSTRAINT objetivos_pkey
+   PRIMARY KEY (idobjetivo, cpf);
+
+ALTER TABLE objetivos
+  ADD CONSTRAINT objetivos_cpf_fkey FOREIGN KEY (cpf)
+  REFERENCES usuario (cpf) 
+  ON UPDATE NO ACTION
+  ON DELETE NO ACTION;
+
+COMMIT;
+
+DROP TABLE IF EXISTS movimentacoes CASCADE;
+
+CREATE TABLE movimentacoes
+(
+   numero_da_movimentacao  integer        NOT NULL,
+   cpf                     char(14)       NOT NULL,
+   valor                   numeric,
+   motivo                  varchar(100),
+   data                    date,
+   hora                    time,
+   recebeu                 boolean,
+   idobjetivo              integer
+);
+
+ALTER TABLE movimentacoes
+  ADD CONSTRAINT fk_idobjetivo FOREIGN KEY (idobjetivo, cpf)
+  REFERENCES objetivos (idobjetivo, cpf) 
+  ON UPDATE NO ACTION
+  ON DELETE NO ACTION;
+
+COMMIT;
+
+DROP TABLE IF EXISTS rendimento_variavel CASCADE;
+
+CREATE TABLE rendimento_variavel
+(
+   ticket            varchar(6)    NOT NULL,
+   cpf               char(14)      NOT NULL,
+   empresa           varchar(20),
+   quantidade        integer,
+   tipo              varchar(25),
+   capital_aplicado  numeric
+);
+
+ALTER TABLE rendimento_variavel
+   ADD CONSTRAINT rendimento_variavel_pkey
+   PRIMARY KEY (ticket, cpf);
+
+ALTER TABLE rendimento_variavel
+  ADD CONSTRAINT rendimento_variavel_cpf_fkey FOREIGN KEY (cpf)
+  REFERENCES usuario (cpf) 
+  ON UPDATE NO ACTION
+  ON DELETE NO ACTION;
+
+COMMIT;
+
+DROP TABLE IF EXISTS titulos_de_renda_fixa CASCADE;
+
+CREATE TABLE titulos_de_renda_fixa
+(
+   titulo            varchar(20)   NOT NULL,
+   cpf               char(14)      NOT NULL,
+   valor_atual       numeric,
+   vencimento        date,
+   rendimento_atual  numeric
+);
+
+ALTER TABLE titulos_de_renda_fixa
+   ADD CONSTRAINT titulos_de_renda_fixa_pkey
+   PRIMARY KEY (titulo, cpf);
+
+ALTER TABLE titulos_de_renda_fixa
+  ADD CONSTRAINT titulos_de_renda_fixa_cpf_fkey FOREIGN KEY (cpf)
+  REFERENCES usuario (cpf) 
+  ON UPDATE NO ACTION
+  ON DELETE NO ACTION;
+
+COMMIT;
+
+INSERT INTO usuario (cpf, email, senha, nome, sobrenome, saldo) VALUES ('123.456.789.10', 'usuario1@gmail.com', 'senha1', 'Usuario', 'Teste', '0.0');
+INSERT INTO usuario (cpf, email, senha, nome, sobrenome, saldo) VALUES ('456.123.789.10', 'matheuspeixoto@gmail.com', 'senhamatheus', 'Matheus', 'Peixoto', '1000.0');
+INSERT INTO usuario (cpf, email, senha, nome, sobrenome, saldo) VALUES ('789.456.123.10', 'joaopedro@gmail.com', 'senhajoao', 'João', 'Pedro', '127.0');
+INSERT INTO usuario (cpf, email, senha, nome, sobrenome, saldo) VALUES ('109.876.543.21', 'marcosvinicius@gmail.com', 'senhamarcos', 'Marcos', 'Vinicius', '855.6');
+
+--Objetivos
+INSERT INTO objetivos (IDOBJETIVO, meta, cpf, caixa, aportes_futuros, preco, data_estimada, adicionar_no_caixa, data_adicionar_no_caixa) VALUES ('1','bicicleta', '123.456.789.10', '500.0', '250.0', '2000.0', '01/06/2021', 'false', '01/06/2021');
+INSERT INTO objetivos (IDOBJETIVO, meta, cpf, caixa, aportes_futuros, preco, data_estimada, adicionar_no_caixa, data_adicionar_no_caixa) VALUES ('1','carro', '456.123.789.10', '2500.0', '500.0', '50000.0', '01/06/2024', 'true', '01/03/2021');
+INSERT INTO objetivos (IDOBJETIVO, meta, cpf, caixa, aportes_futuros, preco, data_estimada, adicionar_no_caixa, data_adicionar_no_caixa) VALUES ('1','casa', '789.456.123.10', '100000.0', '1000.0', '200000.0', '12/01/2030', 'false', '12/01/2030');
+INSERT INTO objetivos (IDOBJETIVO, meta, cpf, caixa, aportes_futuros, preco, data_estimada, adicionar_no_caixa, data_adicionar_no_caixa) VALUES ('1','fogao', '109.876.543.21', '500.0', '50', '750.0', '01/07/2021', 'true', '01/07/2021');
+
+-- MOVIMENTAÇÕES
+INSERT INTO movimentacoes (numero_da_movimentacao, cpf, valor, motivo, data, hora, recebeu, idobjetivo) VALUES ('1', '109.876.543.21', '5.27', 'Lanche', '05/01/2021', '14:00', 'false', null);
+INSERT INTO movimentacoes (numero_da_movimentacao, cpf, valor, motivo, data, hora, recebeu, idobjetivo) VALUES ('2', '109.876.543.21', '100.0', 'Deposito', '05/01/2021', '14:25', 'true', null);
+INSERT INTO movimentacoes (numero_da_movimentacao, cpf, valor, motivo, data, hora, recebeu, idobjetivo) VALUES ('3', '456.123.789.10', '300.0', 'Supermercado', '05/01/2021', '15:00', 'false', null);
+INSERT INTO movimentacoes (numero_da_movimentacao, cpf, valor, motivo, data, hora, recebeu, idobjetivo) VALUES ('4', '789.456.123.10', '100.0', 'Roupa', '05/01/2021', '16:00', 'false', null);
+
+
+--Renda Variavel
+INSERT INTO rendimento_variavel (ticket, cpf, empresa, quantidade, tipo, capital_aplicado) VALUES ('SANB11', '456.123.789.10', 'Santander', '125', 'ações', '15000.0');
+INSERT INTO rendimento_variavel (ticket, cpf, empresa, quantidade, tipo, capital_aplicado) VALUES ('OIBR4', '456.123.789.10', 'Oi', '1000', 'ações', '1300.0');
+INSERT INTO rendimento_variavel (ticket, cpf, empresa, quantidade, tipo, capital_aplicado) VALUES ('MGLU3', '456.123.789.10', 'Magazine Luiza', '100', 'ações', '8000.0');
+INSERT INTO rendimento_variavel (ticket, cpf, empresa, quantidade, tipo, capital_aplicado) VALUES ('XPLG11', '456.123.789.10', 'XP', '65', 'Fundo Imobiliario', '7800.0');
+--Renda Fixa
+INSERT INTO titulos_de_renda_fixa (titulo, cpf, valor_atual, vencimento, rendimento_atual) VALUES ('Poupança', '123.456.789.10', '20000.0', null, '2.4');
+INSERT INTO titulos_de_renda_fixa (titulo, cpf, valor_atual, vencimento, rendimento_atual) VALUES ('IPCA+2035', '109.876.543.21', '120000.0', '15/05/2035', '3.25');
+INSERT INTO titulos_de_renda_fixa (titulo, cpf, valor_atual, vencimento, rendimento_atual) VALUES ('Tesouro Selic', '456.123.789.10', '300000.0', '01/03/2025', '2.0');
+INSERT INTO titulos_de_renda_fixa (titulo, cpf, valor_atual, vencimento, rendimento_atual) VALUES ('Tesouro pré-fixado', '789.456.123.10', '4000.0', '01/01/2023', '4.4');
+
+
+COMMIT;
